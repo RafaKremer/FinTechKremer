@@ -1,4 +1,4 @@
-/*  //arquivo pra pegar de exemplo o que o professor passou
+//arquivo pra pegar de exemplo o que o professor passou
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,4 +39,4 @@ public class ApiController {
         @PathVariable String deviceId,
     )
 
-} */
+}

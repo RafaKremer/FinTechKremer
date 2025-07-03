@@ -1,4 +1,4 @@
-/* package com.projeto.fintech.controller;
+package com.projeto.fintech.controller;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -35,5 +35,3 @@ public class Tratamento {
         }
     }
 }
-
-*/
