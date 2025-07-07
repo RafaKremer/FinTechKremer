@@ -8,7 +8,7 @@ import jakarta.persistence.InheritanceType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-abstract class TipoConta {
+public abstract class TipoConta {
     @Id @GeneratedValue
     private Long id;
     protected double saldo;
