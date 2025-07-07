@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ContaRepository extends JpaRepository<Conta, Long> {
-    // Lembrar que aqui não tem método porquê 
+    // Tenho que lembrar que aqui não tem método porquê 
     // o JpaRepository já fornece os métodos básicos
 }
