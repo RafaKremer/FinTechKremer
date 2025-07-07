@@ -13,12 +13,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class Cartao {
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // gerar ID automaticamente
     private Long id;
     private String tipo;
     private int numero;
     private String usuario;
 
+    @ManyToOne
+    @JoinColumn(name = "conta_id")
+    private Conta conta;
+    
     public Cartao(String tipo, int numero, String usuario) {
         this.tipo = tipo;
         this.numero = numero;

@@ -21,6 +21,6 @@ public class Cliente {
     @OneToOne(cascade = CascadeType.ALL)
     private ContaBancaria contaBancaria;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany // tirei o cascade pra fazer sentido a regra de negócio
     private List<Cartao> cartoes;
 }
