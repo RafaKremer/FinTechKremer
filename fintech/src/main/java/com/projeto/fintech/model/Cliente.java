@@ -17,7 +17,4 @@ public class Cliente {
     private Long id;
     private String nome;
     private String tipo;
-
-    @OneToMany
-    private List<Cartao> cartoes;
 }
