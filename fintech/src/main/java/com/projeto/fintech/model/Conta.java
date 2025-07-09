@@ -13,16 +13,19 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class Conta {
-    @Id @GeneratedValue
+    
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String tipo;
+    
+    private String tipo; 
     private Long numero;
+    private double saldo;
 
-    public Conta(String tipo, Long numero) {
-        this.tipo = tipo;
-        this.numero = numero;
-    }
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
-    @OneToMany
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
     private List<Cartao> cartoes;
 }

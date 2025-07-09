@@ -1,71 +1,60 @@
 package com.projeto.fintech.controller;
 
 import com.projeto.fintech.model.Conta;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.projeto.fintech.repository.ContaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/contas")
 public class ContaController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ContaController.class);
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ContaRepository contaRepository;
 
-    @PostMapping("criar")
+    @PostMapping("/criar")
     public Conta criarConta(@RequestBody Conta conta) {
-        try { // botei um depurador pra cumprir exigências
-            logger.debug("Payload recebido para criação de conta: {}", objectMapper.writeValueAsString(conta));
-        } catch (Exception e) {
-            logger.debug("Não foi possível serializar o objeto conta para o log.");
-        }
-        logger.info("Recebida requisição para criar conta do tipo: {}", conta.getTipo());
-        logger.info("Conta do tipo {} criada com sucesso.", conta.getTipo());
-
-        return conta;
+        return contaRepository.save(conta);
     }
 
-    @GetMapping("mostrar/{tipo}")
-    public Conta mostrarConta(@PathVariable String tipo) {
-        logger.info("Mostrando conta do tipo: {}", tipo);
-        Conta conta = new Conta();
-        conta.setTipo(tipo);
-        return conta;
+    @GetMapping("/todas")
+    public List<Conta> listarTodasContas() {
+        return contaRepository.findAll();
     }
 
-    @GetMapping("/exemplo-erro")
-    public void exemploErro() {
-        try {
-            // Simulando um erro
-            @SuppressWarnings("unused") // coloquei @supr... pra não ficar mostrando o erro no console
-            int resultado = 10 / 0;
-        } catch (Exception e) {
-            logger.error("Ocorreu um erro ao processar a requisição de exemplo.", e);
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<Conta> buscarContaPorId(@PathVariable Long id) {
+        Optional<Conta> conta = contaRepository.findById(id);
+
+        return conta.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("atualizar/{tipo}")
-    public Conta atualizarConta(
-            @PathVariable String tipo) {
-        Conta conta = new Conta();
-        conta.setTipo(tipo);
-        return conta;
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<Conta> atualizarConta(@PathVariable Long id, @RequestBody Conta dadosConta) {
+        return contaRepository.findById(id)
+                .map(contaExistente -> {
+                    contaExistente.setNumero(dadosConta.getNumero());
+                    contaExistente.setTipo(dadosConta.getTipo());
+                    contaExistente.setSaldo(dadosConta.getSaldo());
+                    
+                    Conta contaAtualizada = contaRepository.save(contaExistente);
+                    return ResponseEntity.ok(contaAtualizada);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @PatchMapping("corrigir/{tipo}")
-    public Conta corrigirConta(
-            @PathVariable String tipo) {
-        Conta conta = new Conta();
-        conta.setTipo(tipo);
-        return conta;
-    }
-
-    @DeleteMapping("excluir/{tipo}")
-    public Conta excluirConta(
-            @PathVariable String tipo) {
-        Conta conta = new Conta();
-        conta.setTipo(tipo);
-        return conta;
+    @DeleteMapping("/excluir/{id}")
+    public ResponseEntity<Object> excluirConta(@PathVariable Long id) {
+        return contaRepository.findById(id)
+                .map(conta -> {
+                    contaRepository.delete(conta);
+                    return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
