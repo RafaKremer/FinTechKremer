@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,6 +27,7 @@ public class Transacao {
 
     @ManyToOne // Muitas transações podem estar associadas a uma conta
     @JoinColumn(name = "conta_id")
+    @JsonBackReference("conta-transacao")
     private Conta conta;
 
     public Transacao(double valor, String tipo, Conta conta) {

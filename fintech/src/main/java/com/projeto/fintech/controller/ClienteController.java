@@ -1,51 +1,57 @@
 package com.projeto.fintech.controller;
 
 import com.projeto.fintech.model.Cliente;
+import com.projeto.fintech.repository.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    @PostMapping("criar/{tipo}")
-    public Cliente criarCliente(
-            @PathVariable String tipo) {
-        Cliente cliente = new Cliente();
-        cliente.setTipo(tipo);
-        return cliente;
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @PostMapping("/criar")
+    public Cliente criarCliente(@RequestBody Cliente cliente) {
+        return clienteRepository.save(cliente);
     }
 
-    @GetMapping("mostrar/{tipo}")
-    public Cliente mostrarCliente(
-            @PathVariable String tipo) {
-        Cliente cliente = new Cliente();
-        cliente.setTipo(tipo);
-        return cliente;
+    @GetMapping("/todos")
+    public List<Cliente> listarTodosClientes() {
+        return clienteRepository.findAll();
     }
 
-    @PutMapping("atualizar/{tipo}")
-    public Cliente atualizarCliente(
-            @PathVariable String tipo) {
-        Cliente cliente = new Cliente();
-        cliente.setTipo(tipo);
-        return cliente;
+    @GetMapping("/{id}")
+    public ResponseEntity<Cliente> buscarClientePorId(@PathVariable("id") Long id) {
+        Optional<Cliente> cliente = clienteRepository.findById(id);
+
+        return cliente.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PatchMapping("corrigir/{tipo}")
-    public Cliente corrigirCliente(
-            @PathVariable String tipo) {
-        Cliente cliente = new Cliente();
-        cliente.setTipo(tipo);
-        return cliente;
+    @PutMapping("/atualizar/{id}")
+    public ResponseEntity<Cliente> atualizarCliente(@PathVariable("id") Long id, @RequestBody Cliente dadosCliente) {
+        return clienteRepository.findById(id)
+                .map(clienteExistente -> {
+                    clienteExistente.setNome(dadosCliente.getNome());
+                    clienteExistente.setTipo(dadosCliente.getTipo());
+
+                    Cliente clienteAtualizado = clienteRepository.save(clienteExistente);
+                    return ResponseEntity.ok(clienteAtualizado);
+                }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("excluir/{tipo}")
-    public Cliente excluirCliente(
-            @PathVariable String tipo) {
-        Cliente cliente = new Cliente();
-        cliente.setTipo(tipo);
-        return cliente;
+    @DeleteMapping("/excluir/{id}")
+    public ResponseEntity<Object> excluirCliente(@PathVariable("id") Long id) {
+        return clienteRepository.findById(id)
+                .map(cliente -> {
+                    clienteRepository.delete(cliente);
+                    return ResponseEntity.noContent().build();
+                }).orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-    
 }

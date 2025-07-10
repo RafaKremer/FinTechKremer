@@ -1,7 +1,6 @@
 package com.projeto.fintech.model;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,14 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class Cliente {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String tipo;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    private ContaBancaria contaBancaria;
-
-    @OneToMany // tirei o cascade pra fazer sentido a regra de negócio
-    private List<Cartao> cartoes;
 }
