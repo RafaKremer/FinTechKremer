@@ -1,11 +1,11 @@
 package com.projeto.fintech.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -13,20 +13,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class Cartao {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) // gerar ID automaticamente
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String tipo;
-    private int numero;
+    private Long numero;
     private String usuario;
 
     @ManyToOne
     @JoinColumn(name = "conta_id")
+    @JsonBackReference("conta-cartao")
     private Conta conta;
     
-    public Cartao(String tipo, int numero, String usuario) {
+    public Cartao(String tipo, Long numero, String usuario) {
         this.tipo = tipo;
         this.numero = numero;
         this.usuario = usuario;
     }
-
 }

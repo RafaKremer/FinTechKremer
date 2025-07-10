@@ -1,12 +1,11 @@
 package com.projeto.fintech.controller;
 
 import com.projeto.fintech.model.Transacao;
+import com.projeto.fintech.service.TransacaoService;
 import com.projeto.fintech.repository.TransacaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -14,12 +13,16 @@ import java.util.List;
 public class TransacaoController {
 
     @Autowired
+    private TransacaoService transacaoService;
+    @Autowired
     private TransacaoRepository transacaoRepository;
 
     @PostMapping("/criar")
-    public Transacao criarTransacao(@RequestBody Transacao transacao) {
-        transacao.setData(LocalDateTime.now());
-        return transacaoRepository.save(transacao);
+    public Transacao criarTransacao(@RequestBody Transacao transacaoRequest) {
+        return transacaoService.processarNovaTransacao(
+                transacaoRequest.getConta().getId(),
+                transacaoRequest.getValor(),
+                transacaoRequest.getTipo());
     }
 
     @GetMapping("/todas")
@@ -35,7 +38,8 @@ public class TransacaoController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Transacao> atualizarTransacao(@PathVariable("id") Long id, @RequestBody Transacao dadosTransacao) {
+    public ResponseEntity<Transacao> atualizarTransacao(@PathVariable("id") Long id,
+            @RequestBody Transacao dadosTransacao) {
         return transacaoRepository.findById(id)
                 .map(transacaoExistente -> {
                     transacaoExistente.setValor(dadosTransacao.getValor());

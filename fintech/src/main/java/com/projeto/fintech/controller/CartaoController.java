@@ -2,9 +2,12 @@ package com.projeto.fintech.controller;
 
 import com.projeto.fintech.model.Cartao;
 import com.projeto.fintech.repository.CartaoRepository;
+import com.projeto.fintech.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +18,20 @@ public class CartaoController {
 
     @Autowired
     private CartaoRepository cartaoRepository;
+    
+    @Autowired
+    private ContaRepository contaRepository;
 
     @PostMapping("/criar")
     public Cartao criarCartao(@RequestBody Cartao cartao) {
+        if (cartao.getConta() == null || cartao.getConta().getId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A conta (com id) é obrigatória para criar um cartão.");
+        }
+
+        Long contaId = cartao.getConta().getId();
+        contaRepository.findById(contaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta com id " + contaId + " não encontrada."));
+
         return cartaoRepository.save(cartao);
     }
 
@@ -30,8 +44,6 @@ public class CartaoController {
     public ResponseEntity<Cartao> buscarCartaoPorId(@PathVariable("id") Long id) {
         Optional<Cartao> cartao = cartaoRepository.findById(id);
 
-        // Se o cartão for encontrado, retorna-o com o status 200 OK.
-        // Caso contrário, retorna um 404 Not Found.
         return cartao.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -45,7 +57,8 @@ public class CartaoController {
                     cartaoExistente.setUsuario(dadosCartao.getUsuario());
                     Cartao cartaoAtualizado = cartaoRepository.save(cartaoExistente);
                     return ResponseEntity.ok(cartaoAtualizado);
-                }).orElseGet(() -> ResponseEntity.notFound().build()); // Se não encontrar, retorna 404
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/excluir/{id}")
@@ -53,7 +66,6 @@ public class CartaoController {
         return cartaoRepository.findById(id)
                 .map(cartao -> {
                     cartaoRepository.delete(cartao);
-                    // Retorna uma resposta 204 No Content, indicando sucesso na exclusão
                     return ResponseEntity.noContent().build();
                 }).orElseGet(() -> ResponseEntity.notFound().build());
     }
