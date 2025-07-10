@@ -27,7 +27,7 @@ public class AgenciaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Agencia> buscarAgenciaPorId(@PathVariable Long id) {
+    public ResponseEntity<Agencia> buscarAgenciaPorId(@PathVariable("id") Long id) {
         Optional<Agencia> agencia = agenciaRepository.findById(id);
 
         return agencia.map(ResponseEntity::ok)
@@ -35,7 +35,7 @@ public class AgenciaController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Agencia> atualizarAgencia(@PathVariable Long id, @RequestBody Agencia dadosAgencia) {
+    public ResponseEntity<Agencia> atualizarAgencia(@PathVariable("id") Long id, @RequestBody Agencia dadosAgencia) {
         return agenciaRepository.findById(id)
                 .map(agenciaExistente -> {
                     agenciaExistente.setNome(dadosAgencia.getNome());
@@ -48,7 +48,7 @@ public class AgenciaController {
     }
 
     @DeleteMapping("/excluir/{id}")
-    public ResponseEntity<Object> excluirAgencia(@PathVariable Long id) {
+    public ResponseEntity<Object> excluirAgencia(@PathVariable("id") Long id) {
         return agenciaRepository.findById(id)
                 .map(agencia -> {
                     agenciaRepository.delete(agencia);

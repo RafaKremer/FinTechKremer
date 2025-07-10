@@ -27,7 +27,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarClientePorId(@PathVariable Long id) {
+    public ResponseEntity<Cliente> buscarClientePorId(@PathVariable("id") Long id) {
         Optional<Cliente> cliente = clienteRepository.findById(id);
 
         return cliente.map(ResponseEntity::ok)
@@ -35,7 +35,7 @@ public class ClienteController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Cliente> atualizarCliente(@PathVariable Long id, @RequestBody Cliente dadosCliente) {
+    public ResponseEntity<Cliente> atualizarCliente(@PathVariable("id") Long id, @RequestBody Cliente dadosCliente) {
         return clienteRepository.findById(id)
                 .map(clienteExistente -> {
                     clienteExistente.setNome(dadosCliente.getNome());
@@ -47,7 +47,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/excluir/{id}")
-    public ResponseEntity<Object> excluirCliente(@PathVariable Long id) {
+    public ResponseEntity<Object> excluirCliente(@PathVariable("id") Long id) {
         return clienteRepository.findById(id)
                 .map(cliente -> {
                     clienteRepository.delete(cliente);

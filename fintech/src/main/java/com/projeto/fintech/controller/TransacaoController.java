@@ -28,14 +28,14 @@ public class TransacaoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Transacao> buscarTransacaoPorId(@PathVariable Long id) {
+    public ResponseEntity<Transacao> buscarTransacaoPorId(@PathVariable("id") Long id) {
         return transacaoRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Transacao> atualizarTransacao(@PathVariable Long id, @RequestBody Transacao dadosTransacao) {
+    public ResponseEntity<Transacao> atualizarTransacao(@PathVariable("id") Long id, @RequestBody Transacao dadosTransacao) {
         return transacaoRepository.findById(id)
                 .map(transacaoExistente -> {
                     transacaoExistente.setValor(dadosTransacao.getValor());
@@ -47,7 +47,7 @@ public class TransacaoController {
     }
 
     @DeleteMapping("/excluir/{id}")
-    public ResponseEntity<Object> excluirTransacao(@PathVariable Long id) {
+    public ResponseEntity<Object> excluirTransacao(@PathVariable("id") Long id) {
         return transacaoRepository.findById(id)
                 .map(transacao -> {
                     transacaoRepository.delete(transacao);

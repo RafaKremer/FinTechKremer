@@ -43,7 +43,7 @@ public class ContaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Conta> buscarContaPorId(@PathVariable Long id) {
+    public ResponseEntity<Conta> buscarContaPorId(@PathVariable("id") Long id) {
         Optional<Conta> conta = contaRepository.findById(id);
 
         return conta.map(ResponseEntity::ok)
@@ -51,7 +51,7 @@ public class ContaController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Conta> atualizarConta(@PathVariable Long id, @RequestBody Conta dadosConta) {
+    public ResponseEntity<Conta> atualizarConta(@PathVariable("id") Long id, @RequestBody Conta dadosConta) {
         return contaRepository.findById(id)
                 .map(contaExistente -> {
                     contaExistente.setNumero(dadosConta.getNumero());
@@ -65,7 +65,7 @@ public class ContaController {
     }
 
     @DeleteMapping("/excluir/{id}")
-    public ResponseEntity<Object> excluirConta(@PathVariable Long id) {
+    public ResponseEntity<Object> excluirConta(@PathVariable("id") Long id) {
         return contaRepository.findById(id)
                 .map(conta -> {
                     contaRepository.delete(conta);

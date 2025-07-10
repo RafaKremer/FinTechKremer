@@ -27,7 +27,7 @@ public class CartaoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cartao> buscarCartaoPorId(@PathVariable Long id) {
+    public ResponseEntity<Cartao> buscarCartaoPorId(@PathVariable("id") Long id) {
         Optional<Cartao> cartao = cartaoRepository.findById(id);
 
         // Se o cartão for encontrado, retorna-o com o status 200 OK.
@@ -37,7 +37,7 @@ public class CartaoController {
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Cartao> atualizarCartao(@PathVariable Long id, @RequestBody Cartao dadosCartao) {
+    public ResponseEntity<Cartao> atualizarCartao(@PathVariable("id") Long id, @RequestBody Cartao dadosCartao) {
         return cartaoRepository.findById(id)
                 .map(cartaoExistente -> {
                     cartaoExistente.setTipo(dadosCartao.getTipo());
@@ -49,7 +49,7 @@ public class CartaoController {
     }
 
     @DeleteMapping("/excluir/{id}")
-    public ResponseEntity<Object> excluirCartao(@PathVariable Long id) {
+    public ResponseEntity<Object> excluirCartao(@PathVariable("id") Long id) {
         return cartaoRepository.findById(id)
                 .map(cartao -> {
                     cartaoRepository.delete(cartao);
