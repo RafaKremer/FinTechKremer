@@ -1,7 +1,9 @@
 package com.projeto.fintech.controller;
 
+import com.projeto.fintech.factory.ContaFactory;
 import com.projeto.fintech.model.Conta;
 import com.projeto.fintech.repository.ContaRepository;
+import com.projeto.fintech.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +18,23 @@ public class ContaController {
     @Autowired
     private ContaRepository contaRepository;
 
+    @Autowired
+    private LogService logService;
+
     @PostMapping("/criar")
-    public Conta criarConta(@RequestBody Conta conta) {
-        return contaRepository.save(conta);
+    public ResponseEntity<?> criarConta(@RequestBody Conta conta) {
+        try {
+            // Chamando o método só p/o VSCOde não ficar apitando o erro
+            ContaFactory.criarConta(conta.getTipo());
+            // Se não der erro, vai ser salvo aqui
+            Conta novaConta = contaRepository.save(conta);
+            
+            return ResponseEntity.status(201).body(novaConta);
+
+        } catch (IllegalArgumentException e) {
+            logService.error("Tentativa de criar conta com tipo inválido: " + conta.getTipo());
+            return ResponseEntity.badRequest().body("Erro ao criar conta: " + e.getMessage());
+        }
     }
 
     @GetMapping("/todas")
