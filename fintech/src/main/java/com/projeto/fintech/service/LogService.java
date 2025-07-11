@@ -1,5 +1,6 @@
 package com.projeto.fintech.service;
 
+import com.projeto.fintech.config.ConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -7,27 +8,21 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-// criando um singleton para atender as exigências do projeto
-// coloquei no ContaController para testar o LogService
 @Service
 public class LogService {
 
     private static final Logger logger = LoggerFactory.getLogger(LogService.class);
-
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
+    private final ConfigurationManager config = ConfigurationManager.getInstance();
 
     public LogService() {
-        logger.info("### LogService INICIADO ###");
+        String appName = (String) config.getSetting("application.name");
+        logger.info("### LogService INICIADO para a aplicação: {} ###", appName);
     }
 
-    /**
-     * Registra uma mensagem de informação no log.
-     * @param message A mensagem a ser registrada.
-     */
     public void info(String message) {
         String timestamp = LocalDateTime.now().format(formatter);
-        // 2. Substituindo System.out.println por logger.info()
-        // Registra a mensagem com o nível INFO.
         logger.info("{} - {}", timestamp, message);
     }
 
