@@ -4,9 +4,11 @@ import com.projeto.fintech.factory.ContaFactory;
 import com.projeto.fintech.model.Conta;
 import com.projeto.fintech.repository.ContaRepository;
 import com.projeto.fintech.service.LogService;
+import com.projeto.fintech.service.OperacoesContaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,20 +19,21 @@ public class ContaController {
 
     @Autowired
     private ContaRepository contaRepository;
-
+    
     @Autowired
     private LogService logService;
 
+    @Autowired
+    private ContaFactory contaFactory;
+    
+    @Autowired
+    private OperacoesContaService operacoesContaService;
     @PostMapping("/criar")
     public ResponseEntity<?> criarConta(@RequestBody Conta conta) {
         try {
-            // Chamando o método só p/o VSCOde não ficar apitando o erro
-            ContaFactory.criarConta(conta.getTipo());
-            // Se não der erro, vai ser salvo aqui
+            contaFactory.criarConta(conta.getTipo());
             Conta novaConta = contaRepository.save(conta);
-            
             return ResponseEntity.status(201).body(novaConta);
-
         } catch (IllegalArgumentException e) {
             logService.error("Tentativa de criar conta com tipo inválido: " + conta.getTipo());
             return ResponseEntity.badRequest().body("Erro ao criar conta: " + e.getMessage());
@@ -57,7 +60,7 @@ public class ContaController {
                     contaExistente.setNumero(dadosConta.getNumero());
                     contaExistente.setTipo(dadosConta.getTipo());
                     contaExistente.setSaldo(dadosConta.getSaldo());
-                    
+
                     Conta contaAtualizada = contaRepository.save(contaExistente);
                     return ResponseEntity.ok(contaAtualizada);
                 })
@@ -70,6 +73,28 @@ public class ContaController {
                 .map(conta -> {
                     contaRepository.delete(conta);
                     return ResponseEntity.noContent().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/calcular-rendimento")
+    @Transactional
+    public ResponseEntity<Conta> acionarCalculoRendimento(@PathVariable Long id) {
+        return contaRepository.findById(id)
+                .map(conta -> {
+                    operacoesContaService.calcularRendimento(conta);
+                    return ResponseEntity.ok(conta);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/aplicar-taxa")
+    @Transactional
+    public ResponseEntity<Conta> acionarAplicacaoTaxa(@PathVariable Long id) {
+        return contaRepository.findById(id)
+                .map(conta -> {
+                    operacoesContaService.aplicarTaxaManutencao(conta);
+                    return ResponseEntity.ok(conta);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
